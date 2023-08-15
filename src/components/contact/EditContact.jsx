@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Form, Input } from "antd";
+import { Form, Input } from "antd";
 import {
     useGetContactByIdQuery,
     useUpdateContactMutation,
 } from "../../features/apis/contactApi";
 import { useNavigate, useParams } from "react-router-dom";
 import TextArea from "antd/es/input/TextArea";
+import { Loader, Spinner } from "..";
 
 const EditContact = () => {
     const { contactId } = useParams();
     const [form] = Form.useForm();
     const [canSave, setCanSave] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const formData = Form.useWatch([], form);
     const [updateContact] = useUpdateContactMutation();
     const { data, isLoading, isFetching } = useGetContactByIdQuery(contactId);
@@ -34,10 +37,11 @@ const EditContact = () => {
 
     const handleSubmit = async (data) => {
         const contact = { ...data, favorite: currentContact.favorite };
+        setIsSubmitting(true);
         try {
             const { data } = await updateContact({ id: contactId, contact });
-            //console.log(data);
             if (data?.success) {
+                setIsSubmitting(false);
                 nav(`/contacts/${contactId}`);
             }
         } catch (err) {
@@ -47,11 +51,8 @@ const EditContact = () => {
 
     if (isLoading || isFetching) {
         return (
-            <div className="text-center p-3 h-full flex items-center justify-center">
-                <p className="text-3xl font-bold">
-                    {" "}
-                    Loading . . . Please Wait!{" "}
-                </p>
+            <div className="h-full flex items-center justify-center">
+                <Loader />
             </div>
         );
     }
@@ -97,6 +98,10 @@ const EditContact = () => {
                                 required: true,
                                 message: "Phone No. is required!",
                             },
+                            {
+                                pattern: new RegExp(/^[0-9]\d{8,10}$/),
+                                message: "Please provide valid phone number!",
+                            },
                         ]}
                     >
                         <Input className="p-2 font-sans text-[16px]" />
@@ -125,18 +130,17 @@ const EditContact = () => {
                         />
                     </Form.Item>
 
-                    <Button
-                        className={` font-medium font-sans ${
+                    <button
+                        className={` font-sans font-medium ${
                             canSave
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "bg-gray-200 text-gray-400"
-                        }`}
-                        size="large"
-                        htmlType="submit"
-                        disabled={!canSave}
+                                ? "bg-blue-600 hover:bg-blue-500 text-white shadow-md"
+                                : "bg-gray-200 text-gray-400 "
+                        } w-28 h-10 rounded-md duration-200 flex items-center justify-center text-[16px]
+                         `}
+                        disabled={!canSave || isSubmitting}
                     >
-                        Submit
-                    </Button>
+                        {isSubmitting ? <Spinner /> : "Submit"}
+                    </button>
                 </Form>
             </section>
         </section>

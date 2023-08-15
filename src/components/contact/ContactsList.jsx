@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useGetAllContactsQuery } from "../../features/apis/contactApi";
 import CCard from "./CCard";
 import { useSelector } from "react-redux";
+import { Loader } from "..";
 
 const filteringContactByKeyword = (contactsArr, keyword) => {
     return contactsArr.filter((item) =>
@@ -63,11 +64,8 @@ const ContactsList = () => {
 
     if (isLoading || isFetching) {
         return (
-            <div className="text-center p-3 h-full flex items-center justify-center">
-                <p className="text-3xl font-bold">
-                    {" "}
-                    Loading . . . Please Wait!{" "}
-                </p>
+            <div className=" h-full flex items-center justify-center">
+                <Loader />
             </div>
         );
     }

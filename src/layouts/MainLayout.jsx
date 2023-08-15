@@ -1,11 +1,18 @@
-import React from "react";
-import { Aside } from "../components";
+import { Aside, Loader } from "../components";
 import { Outlet } from "react-router-dom";
 import { useGetAllContactsQuery } from "../features/apis/contactApi";
 const MainLayout = () => {
-    const { data } = useGetAllContactsQuery();
+    const { data, isLoading, isFetching } = useGetAllContactsQuery();
 
     const contacts = data?.data;
+
+    if (isLoading || isFetching) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
 
     return (
         <main className="flex min-h-screen">

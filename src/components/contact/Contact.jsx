@@ -1,5 +1,5 @@
 import { Form, useNavigate, useParams } from "react-router-dom";
-import { CButton } from "..";
+import { CButton, Loader } from "..";
 import { BsStar, BsStarFill } from "react-icons/bs";
 import {
     useDeleteContactMutation,
@@ -9,7 +9,7 @@ import {
 
 const Contact = () => {
     const { contactId } = useParams();
-    const { data } = useGetContactByIdQuery(contactId);
+    const { data, isLoading, isFetching } = useGetContactByIdQuery(contactId);
     const [updateContact] = useUpdateContactMutation();
     const [deleteContact] = useDeleteContactMutation();
     const nav = useNavigate();
@@ -44,6 +44,14 @@ const Contact = () => {
             throw new Error(error);
         }
     };
+
+    if (isLoading || isFetching) {
+        return (
+            <div className="h-full flex items-center justify-center">
+                <Loader />
+            </div>
+        );
+    }
 
     return (
         <section className="h-full flex items-center justify-center md:items-start md:justify-normal">
